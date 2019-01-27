@@ -26,6 +26,6 @@ func Usage() {
 	t.Execute(os.Stderr, struct {
 		Version string
 	}{
-		Version: "0.0.1",
+		Version: Version,
 	})
 }
