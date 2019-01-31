@@ -38,8 +38,21 @@ func main() {
 
 	gstr.Describe(*description)
 
+	if flag.NArg() < 1 {
+		// Read from stdin
+		gstr.Add("gistfile.txt", os.Stdin)
+	}
+
 	for _, arg := range flag.Args() {
-		gstr.Add(filepath.Base(arg))
+		fileName := filepath.Base(arg)
+		f, err := os.Open(arg)
+
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "ERROR: opening file", err)
+			continue
+		}
+
+		gstr.Add(fileName, f)
 	}
 
 	g, err := gstr.Save()

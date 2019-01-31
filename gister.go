@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 
 	"github.com/google/go-github/github"
@@ -10,11 +11,25 @@ import (
 
 type gistfm map[github.GistFilename]github.GistFile
 
+// GistFile represents an unit in a gist
+type GistFile struct {
+	name   string
+	source io.Reader
+}
+
+// NewGistFile instantiates a new GistFile instance
+func NewGistFile(name string, r io.Reader) *GistFile {
+	return &GistFile{
+		name:   name,
+		source: r,
+	}
+}
+
 // Gister creates a gist with a list of files
 type Gister struct {
 	client      *github.Client
 	description string
-	files       []string
+	files       []*GistFile
 	public      bool
 }
 
@@ -29,14 +44,14 @@ func NewGister() (*Gister, error) {
 	return &Gister{
 		client:      c,
 		description: "",
-		files:       make([]string, 0),
+		files:       make([]*GistFile, 0),
 		public:      false,
 	}, nil
 }
 
 // Add adds a file to the gister
-func (g *Gister) Add(name string) {
-	g.files = append(g.files, name)
+func (g *Gister) Add(name string, r io.Reader) {
+	g.files = append(g.files, NewGistFile(name, r))
 }
 
 // Describe adds a description to the gist
@@ -69,8 +84,8 @@ func (g *Gister) Save() (*github.Gist, error) {
 func (g *Gister) fileMap() (gistfm, error) {
 	fxs := make(gistfm)
 
-	for _, fname := range g.files {
-		content, err := ioutil.ReadFile(fname)
+	for _, f := range g.files {
+		content, err := ioutil.ReadAll(f.source)
 
 		if err != nil {
 			return nil, fmt.Errorf("read failed - %v", err)
@@ -78,7 +93,7 @@ func (g *Gister) fileMap() (gistfm, error) {
 
 		data := string(content)
 
-		fxs[github.GistFilename(fname)] = gistFile(fname, data)
+		fxs[github.GistFilename(f.name)] = gistFile(f.name, data)
 	}
 	return fxs, nil
 }
