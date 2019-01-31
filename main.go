@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	flag "github.com/spf13/pflag"
 )
@@ -38,7 +39,7 @@ func main() {
 	gstr.Describe(*description)
 
 	for _, arg := range flag.Args() {
-		gstr.Add(arg)
+		gstr.Add(filepath.Base(arg))
 	}
 
 	g, err := gstr.Save()
