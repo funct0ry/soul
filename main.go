@@ -13,6 +13,7 @@ var (
 	versionRequested = flag.BoolP("version", "v", false, "Print the version.")
 	private          = flag.BoolP("private", "p", false, "Create a private gist.")
 	description      = flag.StringP("description", "d", "", "Adds a description to your gist.")
+	filename         = flag.StringP("filename", "f", "gistfile.txt", "Specify filename and syntax type.")
 )
 
 func main() {
@@ -41,7 +42,7 @@ func main() {
 
 	if flag.NArg() < 1 {
 		// Read from stdin
-		gstr.Add("gistfile.txt", os.Stdin)
+		gstr.Add(*filename, os.Stdin)
 	}
 
 	for _, arg := range flag.Args() {
