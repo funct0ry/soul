@@ -45,7 +45,7 @@ func NewGister() (*Gister, error) {
 		client:      c,
 		description: "",
 		files:       make([]*GistFile, 0),
-		public:      false,
+		public:      true,
 	}, nil
 }
 
@@ -57,6 +57,11 @@ func (g *Gister) Add(name string, r io.Reader) {
 // Describe adds a description to the gist
 func (g *Gister) Describe(s string) {
 	g.description = s
+}
+
+// SetPrivate makes the gist private
+func (g *Gister) SetPrivate(v bool) {
+	g.public = !v
 }
 
 // Save posts the gist to gist.github.com and returns the gist object

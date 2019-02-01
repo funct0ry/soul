@@ -11,8 +11,8 @@ import (
 var (
 	helpRequested    = flag.BoolP("help", "h", false, "Show this message.")
 	versionRequested = flag.BoolP("version", "v", false, "Print the version.")
-
-	description = flag.StringP("description", "d", "", "Adds a description to your gist.")
+	private          = flag.BoolP("private", "p", false, "Create a private gist.")
+	description      = flag.StringP("description", "d", "", "Adds a description to your gist.")
 )
 
 func main() {
@@ -37,6 +37,7 @@ func main() {
 	}
 
 	gstr.Describe(*description)
+	gstr.SetPrivate(*private)
 
 	if flag.NArg() < 1 {
 		// Read from stdin
