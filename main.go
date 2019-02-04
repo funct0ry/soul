@@ -13,6 +13,7 @@ var (
 	versionRequested = flag.BoolP("version", "v", false, "Print the version.")
 	private          = flag.BoolP("private", "p", false, "Create a private gist.")
 	description      = flag.StringP("description", "d", "", "Adds a description to your gist.")
+	gistIDRead       = flag.StringP("read", "r", "", "Read a gist and print out the contents.")
 	filename         = flag.StringP("filename", "f", "gistfile.txt", "Specify filename and syntax type.")
 )
 
@@ -35,6 +36,15 @@ func main() {
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "ERROR:", err)
 		os.Exit(1)
+	}
+
+	if len(*gistIDRead) != 0 {
+		err := gstr.Display(os.Stdout, *gistIDRead, flag.Args())
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "ERROR:", err)
+			os.Exit(1)
+		}
+		return
 	}
 
 	gstr.Describe(*description)

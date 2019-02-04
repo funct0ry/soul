@@ -86,6 +86,33 @@ func (g *Gister) Save() (*github.Gist, error) {
 	return gist, nil
 }
 
+// Display prints the content of the gist to the writer
+func (g *Gister) Display(w io.Writer, id string, files []string) error {
+	gist, _, err := g.client.Gists.Get(context.Background(), id)
+
+	if err != nil {
+		return err
+	}
+
+	var fname string
+
+	if len(files) == 0 {
+		fname = firstFile(gist)
+	} else {
+		fname = files[0]
+	}
+
+	c, ok := gist.Files[github.GistFilename(fname)]
+
+	if !ok {
+		return fmt.Errorf("gist with id of %s and file %s does not exist", id, files[0])
+	}
+
+	w.Write([]byte(*c.Content))
+	return nil
+
+}
+
 func (g *Gister) fileMap() (gistfm, error) {
 	fxs := make(gistfm)
 
@@ -108,4 +135,18 @@ func gistFile(name string, content string) github.GistFile {
 		Filename: &name,
 		Content:  &content,
 	}
+}
+
+func firstFile(g *github.Gist) string {
+
+	if len(g.Files) == 0 {
+		return ""
+	}
+
+	keys := make([]string, 0, len(g.Files))
+	for k := range g.Files {
+		keys = append(keys, string(k))
+	}
+
+	return keys[0]
 }
